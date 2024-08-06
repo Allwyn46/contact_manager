@@ -14,4 +14,5 @@ app.listen(port, () => {
 
 app.use(express.json());
 app.use('/api/contacts', require('./routes/contacts'));
+app.use('/api/users', require('./routes/users'));
 app.use(errorHandler);
