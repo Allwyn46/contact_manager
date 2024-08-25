@@ -1,5 +1,6 @@
 const asyncHandler = require('express-async-handler');
 const User = require('../models/userModel');
+const jwt = require('jsonwebtoken') // JSON WEB TOKEN
 const bcrypt = require('bcrypt');
 
 // REGISTER NEW USER === POST api/users/register
@@ -43,6 +44,7 @@ const registerUser = asyncHandler(async (req, res) => {
 
 // LOGIN EXISTING USER === POST api/users/login
 const loginUser = asyncHandler(async (req, res) => {
+    
     res.json({ Bankai: 'Extend Hozikimaru' });
 });
 
