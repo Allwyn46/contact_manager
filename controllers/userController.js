@@ -1,7 +1,8 @@
 const asyncHandler = require('express-async-handler');
 const User = require('../models/userModel');
-const jwt = require('jsonwebtoken') // JSON WEB TOKEN
+const jwt = require('jsonwebtoken'); // JSON WEB TOKEN
 const bcrypt = require('bcrypt');
+const { json } = require('express');
 
 // REGISTER NEW USER === POST api/users/register
 const registerUser = asyncHandler(async (req, res) => {
@@ -44,13 +45,37 @@ const registerUser = asyncHandler(async (req, res) => {
 
 // LOGIN EXISTING USER === POST api/users/login
 const loginUser = asyncHandler(async (req, res) => {
-    
-    res.json({ Bankai: 'Extend Hozikimaru' });
+    const { email, password } = req.body;
+    if (!email || !password) {
+        res.status(400);
+        throw new Error('All Fields Required');
+    }
+    const user = await User.findOne({ email });
+
+    // COMPARE THE PROVIDED PASSWORD MATCHESS THE HASHED PASSWORD IN THE DATABASE
+
+    if (user && (await bcrypt.compare(password, user.password))) {
+        const accessToken = jwt.sign(
+            {
+                user: {
+                    username: user.username,
+                    email: user.email,
+                    id: user.id,
+                },
+            },
+            process.env.ACCESS_TOKEN_SECRET,
+            { expiresIn: '1m' }
+        );
+        res.status(200).json({ accessToken });
+    } else {
+        res.status(401);
+        throw new Error("The Credentials doesn't Match our Records");
+    }
 });
 
 // LOGGED IN USER DETAILS === GET api/users/currentuser
 const currentUser = asyncHandler(async (req, res) => {
-    res.json({ Bankai: 'Tenza Zangetsu' });
+    res.json(req.user);
 });
 
 module.exports = {
